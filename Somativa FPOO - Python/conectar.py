@@ -2,7 +2,7 @@ import mysql.connector
 
 conexao = mysql.connector.connect(
     host='localhost',
-    database='megasena',
+    database='loja',
     user='root',
     password=''
 )
