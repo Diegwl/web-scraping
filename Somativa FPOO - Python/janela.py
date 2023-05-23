@@ -1,13 +1,14 @@
+from create_database import create_db, create_table
 import tkinter.messagebox
 from tkinter import ttk
 from tkinter import *
-
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
 from conectar import conexao, cursor
 from read import listar_marcas, listar_produtos, search_products
 from tkinter.messagebox import showinfo
 import matplotlib.pyplot as plt
+from web import Web
+from exportar import Exportar
 
 janela = Tk()
 
@@ -52,10 +53,14 @@ class Aplicacao():
         self.btClear.place(relx=0.80, rely=0.15, relwidth=0.1, relheight=0.70)
 
         self.btExportar = Button(self.frame1, text='Exportar', bg="cyan", command=self.limpar)
-        self.btExportar.place(relx=0.80, rely=0.15, relwidth=0.1, relheight=0.70)
+        self.btExportar.place(relx=0.58, rely=0.15, relwidth=0.1, relheight=0.70)
 
-        self.btWeb = Button(self.frame1, text='Web Scraping', bg="cyan", command=self.WebScraping)
+        self.btExportarMarca = Button(self.frame1, text='Exportar Marca', bg="cyan", command=self.limpar)
+        self.btExportarMarca.place(relx=0.69, rely=0.15, relwidth=0.1, relheight=0.70)
+
+        self.btWeb = Button(self.frame1, text='Web Scraping', bg="cyan", command=self.web)
         self.btWeb.place(relx=0.80, rely=0.15, relwidth=0.1, relheight=0.70)
+
 
     def labels(self):
         self.lbMarca = Label(self.frame0, text="Marcas:", background="cyan")
@@ -89,70 +94,94 @@ class Aplicacao():
 
 
     def lista(self):
-        self.listaCli = ttk.Treeview(self.frame2, height=3, columns=("col1", "col2", "col3", "col4"))
+        self.listaProdutos = ttk.Treeview(self.frame2, height=3, columns=("col1", "col2", "col3", "col4"))
 
-        self.listaCli.heading('#0', text='ID')
-        self.listaCli.heading('#1', text='Modelo')
-        self.listaCli.heading('#2', text='Preço')
-        self.listaCli.heading('#3', text='Marca')
+        self.listaProdutos.heading('#0', text='ID')
+        self.listaProdutos.heading('#1', text='Modelo')
+        self.listaProdutos.heading('#2', text='Preço')
+        self.listaProdutos.heading('#3', text='Marca')
 
-        self.listaCli.column('#0', width=50)
-        self.listaCli.column('#1', width=200)
-        self.listaCli.column('#2', width=70)
-        self.listaCli.column('#3', width=70)
+        self.listaProdutos.column('#0', width=50)
+        self.listaProdutos.column('#1', width=360)
+        self.listaProdutos.column('#2', width=80)
+        self.listaProdutos.column('#3', width=120)
 
-        self.listaCli.place(relx=0.025, rely=0.075, relwidth=0.925, relheight=0.85)
+        self.listaProdutos.place(relx=0.025, rely=0.075, relwidth=0.925, relheight=0.85)
 
         self.scrollLista = Scrollbar(self.frame2, orient='vertical')
-        self.listaCli.configure(yscrollcommand=self.scrollLista.set)
+        self.listaProdutos.configure(yscrollcommand=self.scrollLista.set)
         self.scrollLista.place(relx=0.949, rely=0.079, relwidth=0.02, relheight=0.84)
-        self.scrollLista.config(command=self.listaCli.yview)
+        self.scrollLista.config(command=self.listaProdutos.yview)
+
+
 
     def delete_lista(self):
-        self.listaCli.delete(*self.listaCli.get_children())
+        self.listaProdutos.delete(*self.listaProdutos.get_children())
 
     def procurar_produtos(self):
         self.delete_lista()
         linhas = search_products(self.clicked.get())
         for i in range(len(linhas)):
-            self.listaCli.insert(index=i, values=[linhas[i][1], linhas[i][2], linhas[i][3]], parent="", text=linhas[i][0])
+            self.listaProdutos.insert(index=i, values=[linhas[i][1], linhas[i][2], linhas[i][3]], parent="", text=linhas[i][0])
 
     def ler_produtos(self):
         self.delete_lista()
         linhas = listar_produtos()
         for i in range(len(linhas)):
-            self.listaCli.insert(index=i, values=[linhas[i][1], linhas[i][2], linhas[i][3]], parent="", text=linhas[i][0])
+            self.listaProdutos.insert(index=i, values=[linhas[i][1], linhas[i][2], linhas[i][3]], parent="", text=linhas[i][0])
 
     def limpar(self):
         self.delete_lista()
 
+    def web(self):
+        create_db()
+        create_table()
+        W1 = Web()
+        W1.webscraping()
+
     def grafico(self):
-        pass
-        """
         fig = plt.Figure(figsize=(12, 6), dpi=50)
         ax = fig.add_subplot(111)
 
-        numeros = [n for n in range(1, 61)]
+        marcas = ["Macbooks", "Notebook Acer", "Notebook Dell", "Notebook Lenovo", "Notebook Samsung"]
 
-        counts = []
-
-        sql = f"SELECT * from jogos"
-        cursor.execute(sql)
-        linhas = cursor.fetchall()
-        for i in range(1, 61):
-            cont = 0
+        valores = []
+        for marca in marcas:
+            sql = f'select * from produtos where marca = "{marca}"'
+            cursor.execute(sql)
+            linhas = cursor.fetchall()
+            soma_valor = 0
             for linha in linhas:
-                for j in range(1, 7):
-                    if linha[j] == i:
-                        cont += 1
-            counts.append(cont)
+                preco = linha[2]
+                preco_num = preco.replace("R$", "").replace(".", "").replace(",", ".")
+                valor = float(preco_num)
+                soma_valor = soma_valor + valor
+            media_valores = soma_valor/len(linhas)
+            valores.append(media_valores)
 
-        ax.bar(numeros, counts)
+        ax.bar(marcas, valores)
 
-        ax.set_ylabel('Vezes que foi sorteado')
-        ax.set_title('Número de vezes que cada número foi sorteado')
+        ax.set_ylabel('Média de preços')
+        ax.set_title('Média de preço por marca')
 
         canva = FigureCanvasTkAgg(fig, self.janela)
         canva.get_tk_widget().place(relx=0.05, rely=0.50)
-        """
 
+    def exportar_marca(self):
+        linhas = search_products(self.clicked.get())
+        if self.clicked2.get() == ".xlsx":
+            for linha in linhas:
+                e = Exportar(linha[1], linha[2], linha[3])
+                try:
+                    e.del_xlsx()
+                except:
+                    e.criar_xlsx()
+                e.enviar_dados_xlsx()
+        elif self.clicked2.get() == ".csv":
+            for linha in linhas:
+                e = Exportar(linha[1], linha[2], linha[3])
+                try:
+                    e.del_csv()
+                except:
+                    e.criar_csv()
+                e.enviar_dados_csv()

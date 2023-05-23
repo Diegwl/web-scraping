@@ -1,5 +1,6 @@
 from conectar import conexao, cursor
 
+
 def listar_marcas():
     sql = "SELECT marca from produtos"
     cursor.execute(sql)

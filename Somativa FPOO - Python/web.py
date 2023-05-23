@@ -22,18 +22,22 @@ class Web:
                 'xpath': '/html/body/div[1]/div/main/section[4]/div[2]/div/ul/li[$$]/a/div[3]/div/div/p[1]'
             }
         }
+
+    def webscraping(self):
         deletar_produtos()
         self.driver = webdriver.Chrome()
         self.id = 0
         self.driver.get(self.site)
         sleep(2)
         self.driver.find_element(By.XPATH, "/html/body/div[1]/div/main/div/div[2]/button").click()
-        self.driver.find_element(By.XPATH, "/html/body/div[1]/div/main/section[1]/div[2]/header/div/div[2]/div[4]/div[2]/div/div").click()
+        self.driver.find_element(By.XPATH,
+                                 "/html/body/div[1]/div/main/section[1]/div[2]/header/div/div[2]/div[4]/div[2]/div/div").click()
         sleep(2)
         self.driver.refresh()
         for i in range(1, 6):
             sleep(2)
-            informatica = self.driver.find_element(By.XPATH, "/html/body/div[1]/div/main/section[1]/div[2]/header/div/div[3]/nav/ul/li[7]/div[1]/a")
+            informatica = self.driver.find_element(By.XPATH,
+                                                   "/html/body/div[1]/div/main/section[1]/div[2]/header/div/div[3]/nav/ul/li[7]/div[1]/a")
             ActionChains(self.driver).move_to_element(informatica).perform()
             sleep(2)
 
@@ -44,9 +48,10 @@ class Web:
                 sleep(2)
                 self.abrir()
             else:
-                self.marca = self.driver.find_element(By.XPATH, self.map['marca']['xpath'].replace('$$', f'{i+2}')).text
+                self.marca = self.driver.find_element(By.XPATH,
+                                                      self.map['marca']['xpath'].replace('$$', f'{i + 2}')).text
                 print(self.marca)
-                self.driver.find_element(By.XPATH, self.map['marca']['xpath'].replace('$$', f'{i+2}')).click()
+                self.driver.find_element(By.XPATH, self.map['marca']['xpath'].replace('$$', f'{i + 2}')).click()
                 sleep(2)
                 self.abrir()
             sleep(2)
@@ -69,7 +74,3 @@ class Web:
                 print()
             inserir_produtos(self.id, self.modelo.replace("'", "”"), preco, self.marca)
         self.driver.back()
-
-
-if __name__ == "__main__":
-    w = Web()
