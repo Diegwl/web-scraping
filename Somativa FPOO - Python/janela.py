@@ -8,7 +8,8 @@ from read import listar_marcas, listar_produtos, search_products
 from tkinter.messagebox import showinfo
 import matplotlib.pyplot as plt
 from web import Web
-from exportar import Exportar
+import pandas as pd
+import openpyxl
 
 janela = Tk()
 
@@ -44,22 +45,22 @@ class Aplicacao():
 
     def botoes(self):
         self.btBuscarAll = Button(self.frame0, text='Ler', bg="cyan", command=self.ler_produtos)
-        self.btBuscarAll.place(relx=0.58, rely=0.15, relwidth=0.1, relheight=0.70)
+        self.btBuscarAll.place(relx=0.48, rely=0.15, relwidth=0.15, relheight=0.70)
 
         self.btBuscar = Button(self.frame0, text='Buscar', bg="cyan", command=self.procurar_produtos)
-        self.btBuscar.place(relx=0.69, rely=0.15, relwidth=0.1, relheight=0.70)
+        self.btBuscar.place(relx=0.64, rely=0.15, relwidth=0.15, relheight=0.70)
 
         self.btClear = Button(self.frame0, text='Limpar', bg="cyan", command=self.limpar)
-        self.btClear.place(relx=0.80, rely=0.15, relwidth=0.1, relheight=0.70)
+        self.btClear.place(relx=0.80, rely=0.15, relwidth=0.15, relheight=0.70)
 
-        self.btExportar = Button(self.frame1, text='Exportar', bg="cyan", command=self.limpar)
-        self.btExportar.place(relx=0.58, rely=0.15, relwidth=0.1, relheight=0.70)
+        self.btExportar = Button(self.frame1, text='Exportar', bg="cyan", command=self.exportar)
+        self.btExportar.place(relx=0.48, rely=0.15, relwidth=0.15, relheight=0.70)
 
-        self.btExportarMarca = Button(self.frame1, text='Exportar Marca', bg="cyan", command=self.limpar)
-        self.btExportarMarca.place(relx=0.69, rely=0.15, relwidth=0.1, relheight=0.70)
+        self.btExportarMarca = Button(self.frame1, text='Exportar Marca', bg="cyan", command=self.exportar_marca)
+        self.btExportarMarca.place(relx=0.64, rely=0.15, relwidth=0.15, relheight=0.70)
 
         self.btWeb = Button(self.frame1, text='Web Scraping', bg="cyan", command=self.web)
-        self.btWeb.place(relx=0.80, rely=0.15, relwidth=0.1, relheight=0.70)
+        self.btWeb.place(relx=0.80, rely=0.15, relwidth=0.15, relheight=0.70)
 
 
     def labels(self):
@@ -167,21 +168,78 @@ class Aplicacao():
         canva = FigureCanvasTkAgg(fig, self.janela)
         canva.get_tk_widget().place(relx=0.05, rely=0.50)
 
+    def del_xlsx(self):
+        dados = pd.read_excel("Produtos.xlsx")
+        df = pd.DataFrame(dados)
+        df.drop()
+
+    def create_xlsx(self):
+        d = {"Produto": [''], "Preço": [''], "Marca": ['']}
+        dados = pd.DataFrame(data=d)
+        dados.to_excel("Produtos.xlsx", index=False)
+
+    def del_csv(self):
+        dados = pd.read_csv("Produtos.csv")
+        df = pd.DataFrame(dados)
+        df.drop()
+
+    def create_csv(self):
+        d = {"Produto": [''], "Preço": [''], "Marca": ['']}
+        dados = pd.DataFrame(data=d)
+        dados.to_csv("Produtos.csv", index=False)
+
     def exportar_marca(self):
         linhas = search_products(self.clicked.get())
         if self.clicked2.get() == ".xlsx":
+            try:
+                self.del_xlsx()
+            except:
+                pass
+
+            self.create_xlsx()
+            df = pd.read_excel("Produtos.xlsx")
             for linha in linhas:
-                e = Exportar(linha[1], linha[2], linha[3])
-                try:
-                    e.del_xlsx()
-                except:
-                    e.criar_xlsx()
-                e.enviar_dados_xlsx()
+                df.loc[len(df)] = [linha[1], linha[2], linha[3]]
+            df.to_excel("Produtos.xlsx", index=False)
+
         elif self.clicked2.get() == ".csv":
+            try:
+                self.del_csv()
+            except:
+                pass
+
+            self.create_csv()
+            df = pd.read_csv("Produtos.csv")
             for linha in linhas:
-                e = Exportar(linha[1], linha[2], linha[3])
-                try:
-                    e.del_csv()
-                except:
-                    e.criar_csv()
-                e.enviar_dados_csv()
+                df.loc[len(df)] = [linha[1], linha[2], linha[3]]
+            df.to_csv("Produtos.csv", index=False)
+
+        showinfo("Atenção", "Arquivo Criado")
+
+    def exportar(self):
+        linhas = listar_produtos()
+        if self.clicked2.get() == ".xlsx":
+            try:
+                self.del_xlsx()
+            except:
+                pass
+
+            self.create_xlsx()
+            df = pd.read_excel("Produtos.xlsx")
+            for linha in linhas:
+                df.loc[len(df)] = [linha[1], linha[2], linha[3]]
+            df.to_excel("Produtos.xlsx", index=False)
+
+        elif self.clicked2.get() == ".csv":
+            try:
+                self.del_csv()
+            except:
+                pass
+
+            self.create_csv()
+            df = pd.read_csv("Produtos.csv")
+            for linha in linhas:
+                df.loc[len(df)] = [linha[1], linha[2], linha[3]]
+            df.to_csv("Produtos.csv", index=False)
+
+        showinfo("Atenção", "Arquivo Criado")
