@@ -1,5 +1,3 @@
-from create_database import create_db, create_table
-import tkinter.messagebox
 from tkinter import ttk
 from tkinter import *
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -135,8 +133,6 @@ class Aplicacao():
         self.delete_lista()
 
     def web(self):
-        create_db()
-        create_table()
         W1 = Web()
         W1.webscraping()
 
