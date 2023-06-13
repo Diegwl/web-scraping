@@ -5,21 +5,22 @@ from selenium.webdriver import ActionChains
 from create_database import inserir_produtos, deletar_produtos
 
 
+
 class Web:
     def __init__(self):
         self.site = 'https://www.magazineluiza.com.br/'
         self.map = {
             'marca': {
-                'xpath': '/html/body/div[1]/div/main/section[1]/div[2]/header/div/div[3]/nav/ul/li[7]/div[2]/div/div/div[1]/ul/li[$$]/a'
+                'xpath': '/html/body/div[2]/div/main/section[1]/div[2]/header/div/div[3]/nav/ul/li[7]/div[2]/div/div/div[1]/ul/li[$$]/a'
             },
             'modelo': {
-                'xpath': '/html/body/div[1]/div/main/section[4]/div[2]/div/ul/li[$$]/a/div[3]/h2'
+                'xpath': '/html/body/div[2]/div/main/section[4]/div[2]/div/ul/li[$$]/a/div[3]/h2'
             },
             'preco_promo': {
-                'xpath': '/html/body/div[1]/div/main/section[4]/div[2]/div/ul/li[$$]/a/div[3]/div[2]/div/p[2]'
+                'xpath': '/html/body/div[2]/div/main/section[4]/div[2]/div/ul/li[$$]/a/div[3]/div[2]/div/p[2]'
             },
             'preco': {
-                'xpath': '/html/body/div[1]/div/main/section[4]/div[2]/div/ul/li[$$]/a/div[3]/div/div/p[1]'
+                'xpath': '/html/body/div[2]/div/main/section[4]/div[2]/div/ul/li[$$]/a/div[3]/div/div/p[1]'
             }
         }
 
@@ -29,15 +30,14 @@ class Web:
         self.id = 0
         self.driver.get(self.site)
         sleep(2)
-        self.driver.find_element(By.XPATH, "/html/body/div[1]/div/main/div/div[2]/button").click()
-        self.driver.find_element(By.XPATH,
-                                 "/html/body/div[1]/div/main/section[1]/div[2]/header/div/div[2]/div[4]/div[2]/div/div").click()
+        self.driver.find_element(By.XPATH, "/html/body/div[2]/div[2]/a[1]").click()
+        self.driver.find_element(By.XPATH, "/html/body/div[4]/div/main/section[1]/div[2]/header/div/div[2]/div[4]/div[2]/div/div").click()
         sleep(2)
         self.driver.refresh()
         for i in range(1, 6):
             sleep(2)
             informatica = self.driver.find_element(By.XPATH,
-                                                   "/html/body/div[1]/div/main/section[1]/div[2]/header/div/div[3]/nav/ul/li[7]/div[1]/a")
+                                                   "/html/body/div[2]/div/main/section[1]/div[2]/header/div/div[3]/nav/ul/li[7]/div[1]")
             ActionChains(self.driver).move_to_element(informatica).perform()
             sleep(2)
 
